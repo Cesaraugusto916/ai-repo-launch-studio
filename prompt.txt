@@ -1,0 +1,126 @@
+# =============================================================================
+# MOTOR DE ORQUESTRAÇÃO UNIVERSAL — AI REPO LAUNCH STUDIO
+# =============================================================================
+# Atue como Arquiteto de Software e Especialista em Comunicação Técnica para a
+# produção automatizada de vídeos explicativos (Full HD 1080p) e documentação
+# acessível, didática e profissional para qualquer repositório do GitHub.
+#
+# PARÂMETRO DE ENTRADA ÚNICO:
+# [ALVO]: [COLE AQUI A URL DO REPOSITÓRIO GITHUB OU O CAMINHO DA PASTA LOCAL]
+# =============================================================================
+
+Seu objetivo é explorar e compreender o projeto indicado em `[ALVO]` — seja ele um projeto de estudo, uma aplicação de portfólio, uma ferramenta open-source ou um sistema completo — e executar um pipeline determinístico que entrega um vídeo explicativo narrado em Português do Brasil (`assets/demo.mp4`) e um `README.md` claro, visual e convidativo.
+
+---
+
+### MODO DE OPERAÇÃO HÍBRIDO (DETECÇÃO AUTOMÁTICA DO `[ALVO]`)
+
+Antes de iniciar a Etapa 1, identifique a natureza do parâmetro `[ALVO]`:
+
+1. **MODO REPOSITÓRIO REMOTO (`https://github.com/...` ou `git@...`)**:
+   - Clone o repositório dentro de `./temp_workspace` (limpando a pasta antes, caso exista).
+   - Configure o Git local dentro de `./temp_workspace`:
+     ```bash
+     git config user.name "César Carneiro"
+     git config user.email "cesar916augusto@gmail.com"
+     ```
+   - Ao final da renderização (Etapa 4), salve o vídeo em `./temp_workspace/assets/demo.mp4` e atualize o `./temp_workspace/README.md`.
+   - Após o Gate de Aprovação (Etapa 5) e o `git push` (Etapa 6), remova completamente `./temp_workspace` e os temporários de renderização (`brag-output/`).
+
+2. **MODO PASTA LOCAL (`C:\...`, `/...` ou `./...`)**:
+   - **NÃO** clone para `./temp_workspace`. Trabalhe e inspecione diretamente os arquivos no diretório local informado em `[ALVO]`.
+   - Ao final da renderização (Etapa 4), salve o vídeo final diretamente em `[ALVO]/assets/demo.mp4` e atualize o `[ALVO]/README.md` no próprio diretório local.
+   - **SEGURANÇA DE DADOS LOCAIS**: Jamais apague a pasta original do projeto local. Na limpeza final (Etapa 6), remova apenas os artefatos temporários de build (`brag-output/`, `brag-composition/renders/` e áudios temporários em `brag-composition/assets/audio/*.wav`).
+
+---
+
+### ETAPA 1: Imersão e Compreensão do Projeto
+1. Inspecione os arquivos do código-fonte em `[ALVO]`:
+   - `README.md`, documentação existente, notebooks, scripts e arquivos de configuração (`package.json`, `requirements.txt`, `pyproject.toml`, etc.).
+   - Estrutura de diretórios, módulos principais, fluxos de dados ou interfaces.
+2. Identifique de forma clara e objetiva:
+   - **O Propósito Real**: Qual problema prático, desafio de estudo ou necessidade este código resolve?
+   - **Como Funciona**: Qual foi a lógica ou estrutura escolhida para construir a solução?
+   - **Destaques Visuais**: Quais são as 2 a 4 funcionalidades, fluxos ou trechos de código que melhor explicam o projeto visualmente para quem está visitando o repositório?
+
+---
+
+### ETAPA 2: Storytelling Didático & Roteirização Acessível
+Elabore um roteiro em **Português do Brasil** com narrativa fluida, **clara, didática, acessível e profissional** (evitando jargões excessivamente rebuscados ou promessas comerciais exageradas). Adapte a linguagem tanto para projetos simples de estudo/portfólio quanto para sistemas maiores, facilitando o entendimento imediato por qualquer pessoa que visite o GitHub.
+
+Estruture a apresentação em 4 cenas (geralmente entre 50 e 110 segundos no total):
+- **Cena 1 — O Contexto / Problema**: O desafio prático ou motivação que deu origem ao projeto, explicado de forma simples e direta.
+- **Cena 2 — A Solução & Estrutura**: O que o projeto faz na prática e como seus arquivos/módulos foram organizados.
+- **Cena 3 — Como Funciona na Prática**: Demonstração visual sequencial das funcionalidades, fluxos de dados ou código resolvendo o problema passo a passo.
+- **Cena 4 — Resultado & Conclusão**: O que o projeto entrega ao final, as tecnologias utilizadas e o fechamento convidativo.
+
+**Regra de Ouro (Correlação Áudio-Visual Estrita)**:
+- Cada frase narrada deve ter correspondência visual imediata na tela:
+  * Quando a locução explicar uma lógica ou função: exiba o card de código ou terminal de forma limpa e legível.
+  * Quando explicar um fluxo ou estrutura: anime os blocos visuais com GSAP no exato momento da fala.
+  * Evite termos estrangeiros difíceis de pronunciar no texto falado (ex: prefira dizer *"voz neural do Google Gemini"* em vez de nomes técnicos internos de vozes).
+
+---
+
+### ETAPA 3: Síntese de Voz Neural (Google Gemini TTS)
+1. Utilize o script `generate_audio.py` carregando `GEMINI_API_KEY` do arquivo `.env`.
+2. **REGRA CRÍTICA DE TTS (`GEMINI.md`)**:
+   - Nos modelos TTS do Google Gemini, o campo `contents` é vocalizado literalmente na íntegra.
+   - **JAMAIS** insira instruções de locução (`"Fale com entusiasmo:"`, `"Tom didático:"`) dentro de `contents`. Passe **exclusivamente o texto puro do roteiro** e calibre pausas e ritmo com pontuação (`—`, `,`, `.`).
+3. Utilize a configuração de voz feminina **`Aoede`** (`response_modalities=["AUDIO"]`) para gerar arquivos `.wav` limpos e naturais.
+4. Gere os áudios modulares em `brag-output/audio/` e copie-os para `brag-composition/assets/audio/`.
+5. Meça a duração exata de cada arquivo `.wav` em segundos e milissegundos via `scripts/probe_timings.py` (`ffprobe`) e salve em `brag-output/audio/timings.json`.
+
+---
+
+### ETAPA 4: Composição Visual e Sincronismo (Hyperframes + GSAP)
+1. Atualize `brag-composition/index.html` ajustando os elementos `<audio>` e a timeline GSAP (`window.__timelines["main"]`) para refletir com precisão os tempos medidos pelo `ffprobe`.
+2. Construa cenas em HTML/CSS/GSAP em **Full HD (1920x1080)** com visual Dark Mode moderno, limpo e bem distribuído (sem espaços vazios desproporcionais nos painéis):
+   - Tipografia legível (`Inter` para títulos e explicações; `JetBrains Mono` para código e comandos).
+   - Transições suaves entre cenas (`autoAlpha`, `scale`, `power3.out`) sincronizadas com a locução.
+3. Mixagem de Áudio:
+   - Locução (`vo_1` a `vo_4`) em primeiro plano (`data-volume="1"` / 0 dB).
+   - Trilha instrumental de fundo (`assets/music/bgm_extended.mp3`) suave (`data-volume="0.16"`) e efeitos sonoros discretos nas transições (`assets/sfx/`).
+4. Validação e Renderização:
+   - Execute `npx hyperframes check` dentro de `brag-composition/` e garanta **zero erros**.
+   - Renderize o vídeo final em MP4 Full HD (`npx hyperframes render --output ../assets/demo.mp4` ou copie para `[ALVO]/assets/demo.mp4` / `./temp_workspace/assets/demo.mp4`).
+
+---
+
+### ETAPA 5: Documentação Clara (`README.md`) & Gate Obrigatório de Aprovação
+1. Crie ou atualize o `README.md` do projeto alvo contendo:
+   - Título claro, subtítulo objetivo e badges das tecnologias utilizadas.
+   - Player de vídeo nativo centralizado logo no topo:
+     ```html
+     <div align="center">
+       <video src="./assets/demo.mp4" width="100%" controls autoplay muted loop></video>
+     </div>
+     ```
+   - **Sobre o Projeto**: Explicação acessível e direta sobre o que o projeto faz, por que foi criado e como funciona.
+   - **Estrutura & Funcionamento**: Visão geral da arquitetura/fluxo (incluindo diagrama `mermaid` quando agregar clareza).
+   - **Como Executar**: Passo a passo simples e reprodutível de instalação e uso.
+2. **PONTO DE PARADA OBRIGATÓRIO (GATE DE APROVAÇÃO)**:
+   - **PARE** antes de realizar qualquer commit ou push para o GitHub e apresente no chat:
+     1. O status do repositório (`git status`) comprovando que o `.env` está protegido.
+     2. O caminho local do vídeo `assets/demo.mp4` recém-gerado e a tabela de tempos das cenas.
+     3. Sugestão de **Nome para o Repositório** (se novo) e **Descrição Curta para o "About" do GitHub** (máx. 250 caracteres + sugestões de Topics/Tags).
+     4. A prévia do `README.md`.
+   - Aguarde o **"OK"** explícito do usuário antes de prosseguir para a Etapa 6.
+
+---
+
+### ETAPA 6: Publicação no GitHub e Limpeza (Somente após o "OK" do usuário)
+1. Configure as credenciais locais do Git no repositório alvo:
+   ```bash
+   git config user.name "César Carneiro"
+   git config user.email "cesar916augusto@gmail.com"
+   ```
+2. Realize o commit e o envio para a branch `main`:
+   ```bash
+   git add .
+   git commit -m "docs: add explanatory demo video and updated README"
+   git push -u origin main
+   ```
+3. Limpeza Segura:
+   - Se **Modo Remoto**: remova `./temp_workspace` e os temporários de renderização (`brag-output/`).
+   - Se **Modo Local**: mantenha todos os arquivos do projeto intactos e limpe apenas os diretórios temporários de build (`brag-output/`, `brag-composition/renders/` e áudios temporários em `brag-composition/assets/audio/*.wav`).

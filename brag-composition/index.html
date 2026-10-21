@@ -1,0 +1,966 @@
+<!doctype html>
+<html lang="pt-BR" data-resolution="landscape">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>AI Repo Launch Studio — Repositórios Mais Acessíveis, Visuais e Fáceis de Entender</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html, body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #030712;
+        color: #f1f5f9;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      .mono {
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      /* Main container */
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: radial-gradient(circle at 50% 10%, #0d1b36 0%, #050a18 55%, #02040a 100%);
+      }
+
+      /* Tech background grid */
+      .bg-grid {
+        position: absolute;
+        inset: 0;
+        background-image: 
+          linear-gradient(to right, rgba(56, 189, 248, 0.035) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(56, 189, 248, 0.035) 1px, transparent 1px);
+        background-size: 60px 60px;
+        opacity: 0.85;
+        pointer-events: none;
+      }
+
+      /* Glowing orbs */
+      .orb-glow {
+        position: absolute;
+        width: 820px;
+        height: 820px;
+        border-radius: 50%;
+        filter: blur(180px);
+        opacity: 0.20;
+        pointer-events: none;
+      }
+      .orb-1 {
+        top: -220px;
+        left: 160px;
+        background: #2563eb;
+      }
+      .orb-2 {
+        bottom: -240px;
+        right: 160px;
+        background: #7c3aed;
+      }
+
+      /* Top fixed header badge */
+      .top-nav {
+        position: absolute;
+        top: 28px;
+        left: 64px;
+        right: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 100;
+      }
+      .brand-badge {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 9px 24px;
+        background: rgba(15, 23, 42, 0.90);
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        border-radius: 9999px;
+        backdrop-filter: blur(14px);
+        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.45);
+      }
+      .brand-dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #38bdf8;
+        box-shadow: 0 0 14px #38bdf8;
+      }
+      .brand-name {
+        font-size: 14px;
+        font-weight: 800;
+        letter-spacing: 0.8px;
+        color: #ffffff;
+      }
+      .brand-tag {
+        font-size: 11px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        color: #fff;
+        padding: 3px 10px;
+        border-radius: 12px;
+      }
+      .system-status {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .status-pill {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: rgba(15, 23, 42, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 9999px;
+        font-size: 12px;
+        color: #cbd5e1;
+      }
+      .status-dot-green {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #10b981;
+        box-shadow: 0 0 10px #10b981;
+      }
+
+      /* Scenes base layout */
+      .scene {
+        position: absolute;
+        inset: 0;
+        padding: 100px 64px 52px 64px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      .scene-header {
+        margin-bottom: 20px;
+      }
+      .scene-kicker {
+        font-size: 13px;
+        font-weight: 700;
+        color: #38bdf8;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+      .scene-title {
+        font-size: 42px;
+        font-weight: 900;
+        letter-spacing: -1px;
+        color: #ffffff;
+        line-height: 1.15;
+      }
+      .scene-desc {
+        font-size: 17px;
+        color: #94a3b8;
+        margin-top: 6px;
+        max-width: 1280px;
+      }
+
+      /* 2-Column Grid */
+      .grid-2col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 28px;
+        flex: 1;
+        min-height: 0;
+      }
+
+      .card-glass {
+        background: rgba(15, 23, 42, 0.78);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 18px;
+        padding: 26px;
+        display: flex;
+        flex-direction: column;
+        backdrop-filter: blur(18px);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+      }
+
+      /* Terminal / Code Window */
+      .terminal-box {
+        background: #060b16;
+        border: 1px solid rgba(56, 189, 248, 0.22);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      }
+      .terminal-header {
+        background: #0f172a;
+        padding: 10px 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .t-dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+      }
+      .t-red { background: #ef4444; }
+      .t-yellow { background: #f59e0b; }
+      .t-green { background: #10b981; }
+      .terminal-title {
+        font-size: 12px;
+        color: #94a3b8;
+        margin-left: 8px;
+      }
+      .terminal-body {
+        padding: 18px;
+        font-size: 13.5px;
+        line-height: 1.65;
+        color: #e2e8f0;
+      }
+
+      .code-kw { color: #c084fc; font-weight: 600; }
+      .code-fn { color: #38bdf8; font-weight: 600; }
+      .code-str { color: #34d399; }
+      .code-var { color: #fbbf24; }
+      .code-comment { color: #94a3b8; font-style: italic; }
+
+      /* Metric & Feature Cards */
+      .stat-metric-card {
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 14px;
+      }
+      .stat-metric-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 6px;
+      }
+      .stat-value {
+        font-size: 21px;
+        font-weight: 800;
+        color: #ffffff;
+      }
+      .stat-desc {
+        font-size: 13.5px;
+        color: #94a3b8;
+        margin-top: 4px;
+        line-height: 1.4;
+      }
+
+      /* Pills & Badges */
+      .tech-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 13px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 600;
+        background: rgba(30, 41, 59, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #e2e8f0;
+      }
+      .badge-danger {
+        background: rgba(239, 68, 68, 0.15);
+        border-color: rgba(239, 68, 68, 0.35);
+        color: #f87171;
+      }
+      .badge-warning {
+        background: rgba(245, 158, 11, 0.15);
+        border-color: rgba(245, 158, 11, 0.35);
+        color: #fbbf24;
+      }
+      .badge-info {
+        background: rgba(56, 189, 248, 0.15);
+        border-color: rgba(56, 189, 248, 0.35);
+        color: #38bdf8;
+      }
+      .badge-success {
+        background: rgba(16, 185, 129, 0.15);
+        border-color: rgba(16, 185, 129, 0.35);
+        color: #34d399;
+      }
+      .badge-purple {
+        background: rgba(168, 85, 247, 0.15);
+        border-color: rgba(168, 85, 247, 0.35);
+        color: #c084fc;
+      }
+
+      /* Architecture Engine Box */
+      .arch-engine-box {
+        background: rgba(15, 23, 42, 0.88);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 16px;
+      }
+      .arch-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 19px;
+        font-weight: 800;
+        color: #ffffff;
+        margin-bottom: 8px;
+      }
+      .arch-desc {
+        font-size: 14px;
+        color: #94a3b8;
+        line-height: 1.5;
+        margin-bottom: 12px;
+      }
+
+      /* Layer Stack Cards (Scene 3) */
+      .layer-card {
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 15px 18px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .layer-num {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: 800;
+        flex-shrink: 0;
+      }
+
+      /* Deliverables Cards */
+      .rec-card {
+        background: rgba(15, 23, 42, 0.88);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 18px;
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+        flex: 1;
+      }
+      .rec-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        flex-shrink: 0;
+      }
+
+      /* Outro Author Card */
+      .author-card {
+        background: linear-gradient(135deg, rgba(30, 58, 138, 0.45) 0%, rgba(67, 56, 202, 0.35) 100%);
+        border: 1px solid rgba(56, 189, 248, 0.38);
+        border-radius: 16px;
+        padding: 24px 28px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+      }
+      .avatar-circle {
+        width: 82px;
+        height: 82px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2563eb, #8b5cf6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        font-weight: 900;
+        color: white;
+        box-shadow: 0 0 25px rgba(37, 99, 235, 0.6);
+        flex-shrink: 0;
+      }
+
+      /* Tech Ecosystem Grid (Scene 4 Right Panel) */
+      .stack-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-top: 12px;
+      }
+      .stack-item {
+        background: rgba(30, 41, 59, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 10px;
+        padding: 11px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-width="1920" data-height="1080">
+      <div class="bg-grid"></div>
+      <div class="orb-glow orb-1" data-layout-allow-overflow></div>
+      <div class="orb-glow orb-2" data-layout-allow-overflow></div>
+
+      <!-- TOP FIXED HEADER -->
+      <header class="top-nav">
+        <div class="brand-badge">
+          <div class="brand-dot"></div>
+          <span class="brand-name mono">AI REPO LAUNCH STUDIO</span>
+          <span class="brand-tag">OPEN-SOURCE TOOL</span>
+        </div>
+        <div class="system-status">
+          <div class="status-pill mono">
+            <div class="status-dot-green"></div>
+            <span>PYTHON • GOOGLE GEMINI TTS • FFPROBE • HYPERFRAMES GSAP</span>
+          </div>
+          <div class="status-pill mono">
+            <span>CÉSAR CARNEIRO | GESTÃO DE IA &amp; DADOS</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- AUDIO ELEMENTS MIXING (VOICE 0dB, BGM DUCKED 16%) -->
+      <audio id="bgm" data-start="0" data-duration="97" data-track-index="1" data-volume="0.16" src="assets/music/bgm_extended.mp3"></audio>
+      <audio id="vo_1" data-start="0.50" data-duration="18.531" data-track-index="2" data-volume="1" src="assets/audio/cena_01_problema.wav"></audio>
+      <audio id="vo_2" data-start="20.13" data-duration="21.611" data-track-index="2" data-volume="1" src="assets/audio/cena_02_arquitetura.wav"></audio>
+      <audio id="vo_3" data-start="42.84" data-duration="27.251" data-track-index="2" data-volume="1" src="assets/audio/cena_03_motor_tecnico.wav"></audio>
+      <audio id="vo_4" data-start="71.19" data-duration="23.851" data-track-index="2" data-volume="1" src="assets/audio/cena_04_resultado.wav"></audio>
+
+      <!-- SOUND EFFECTS -->
+      <audio id="sfx_intro" data-start="0.20" data-duration="0.18" data-track-index="3" data-volume="0.4" src="assets/sfx/impact.ogg"></audio>
+      <audio id="sfx_scene2" data-start="19.65" data-duration="0.11" data-track-index="3" data-volume="0.35" src="assets/sfx/drop.ogg"></audio>
+      <audio id="sfx_scene3" data-start="42.35" data-duration="0.11" data-track-index="3" data-volume="0.35" src="assets/sfx/drop.ogg"></audio>
+      <audio id="sfx_scene4" data-start="70.70" data-duration="1.48" data-track-index="3" data-volume="0.4" src="assets/sfx/bell.ogg"></audio>
+      <audio id="sfx_outro" data-start="95.20" data-duration="0.18" data-track-index="3" data-volume="0.5" src="assets/sfx/impact.ogg"></audio>
+
+      <!-- ======================================================== -->
+      <!-- CENA 1: O PROBLEMA — A BARREIRA DO CÓDIGO PURO           -->
+      <!-- ======================================================== -->
+      <section id="scene_1" class="scene">
+        <div class="scene-header">
+          <div class="scene-kicker mono">01 // O DESAFIO: ACESSIBILIDADE E CLAREZA EM REPOSITÓRIOS</div>
+          <h1 class="scene-title">Entender um Projeto Apenas Lendo Código Nem Sempre é Simples</h1>
+          <p class="scene-desc">Projetos incríveis de estudo, portfólio ou código aberto deixam de ser compreendidos quando falta uma explicação visual logo no primeiro contato.</p>
+        </div>
+
+        <div class="grid-2col">
+          <!-- Left: The Friction of Code-Only Repos -->
+          <div class="card-glass s1-left-panel" style="justify-content: space-between;">
+            <div class="terminal-box s1-terminal" style="margin-bottom: 14px;">
+              <div class="terminal-header">
+                <div class="t-dot t-red"></div>
+                <div class="t-dot t-yellow"></div>
+                <div class="t-dot t-green"></div>
+                <span class="terminal-title mono">visitante_no_github.sh — Primeiro Contato com o Repositório</span>
+              </div>
+              <div class="terminal-body mono">
+                <span style="color: #94a3b8;">$ Abrindo repositório de estudo, portfólio ou open-source...</span><br>
+                <span style="color: #f87171;">[!] BARREIRA: Dezenas de pastas e blocos longos de texto técnico</span><br>
+                <span style="color: #fbbf24;">[!] DÚVIDA: "O que exatamente este código faz e como funciona?"</span><br>
+                <span style="color: #38bdf8;">[SOLUÇÃO] Um vídeo curto e didático aproxima o criador do visitante</span>
+              </div>
+            </div>
+
+            <!-- Barrier 1 -->
+            <div class="stat-metric-card s1-p1" style="border-left: 4px solid #ef4444; margin-bottom: 12px;">
+              <div class="stat-metric-header">
+                <span class="mono" style="font-size: 12px; color: #f87171; font-weight: 700;">DESAFIO 01: EXCESSO DE TEXTO E PASTAS</span>
+                <span class="tech-pill badge-danger mono">DIFÍCIL LEITURA</span>
+              </div>
+              <div class="stat-value">Blocos de Código Sem Contexto Visual</div>
+              <p class="stat-desc">Navegar por arquivos soltos exige esforço para entender a ideia central de quem criou o projeto.</p>
+            </div>
+
+            <!-- Barrier 2 -->
+            <div class="stat-metric-card s1-p2" style="border-left: 4px solid #f59e0b; margin-bottom: 12px;">
+              <div class="stat-metric-header">
+                <span class="mono" style="font-size: 12px; color: #fbbf24; font-weight: 700;">DESAFIO 02: PROJETOS DE ESTUDO E PORTFÓLIO</span>
+                <span class="tech-pill badge-warning mono">POUCA VISIBILIDADE</span>
+              </div>
+              <div class="stat-value">Trabalhos Incríveis Passam Despercebidos</div>
+              <p class="stat-desc">Estudantes, devs e criadores open-source precisam mostrar suas ideias de forma rápida e convidativa.</p>
+            </div>
+
+            <!-- Barrier 3 -->
+            <div class="stat-metric-card s1-p3" style="border-left: 4px solid #a855f7; margin-bottom: 0;">
+              <div class="stat-metric-header">
+                <span class="mono" style="font-size: 12px; color: #c084fc; font-weight: 700;">DESAFIO 03: GRAVAÇÃO E EDIÇÃO MANUAL</span>
+                <span class="tech-pill badge-purple mono">TRABALHOSO</span>
+              </div>
+              <div class="stat-value">Gravar a Tela e Editar Vídeo Toma Muito Tempo</div>
+              <p class="stat-desc">Criar uma apresentação clara deveria ser tão simples quanto compartilhar o link do repositório.</p>
+            </div>
+          </div>
+
+          <!-- Right: The Accessible Solution -->
+          <div class="card-glass s1-solution-panel" style="justify-content: space-between; background: radial-gradient(circle at 70% 30%, rgba(37,99,235,0.18) 0%, rgba(15,23,42,0.88) 100%);">
+            <div style="text-align: center; margin-top: 8px;">
+              <span class="tech-pill badge-success mono" style="font-size: 13px; padding: 6px 16px; margin-bottom: 12px;">CLAREZA E ACESSIBILIDADE NO GITHUB</span>
+              <h2 style="font-size: 34px; font-weight: 900; color: #ffffff; margin-top: 8px;">AI Repo Launch Studio</h2>
+              <p style="color: #cbd5e1; font-size: 15.5px; max-width: 580px; margin: 10px auto 0; line-height: 1.5;">
+                Transforma qualquer código-fonte em um vídeo explicativo, didático e fácil de acompanhar logo no primeiro contato.
+              </p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0;">
+              <div class="card-glass s1-pil-1" style="padding: 18px; background: rgba(30,41,59,0.75); border: 1px solid rgba(56,189,248,0.28);">
+                <span class="mono" style="font-size: 11px; color: #38bdf8; font-weight: 700;">PARA QUALQUER PROJETO</span>
+                <div style="font-size: 24px; font-weight: 900; color: #fff; margin: 6px 0;">Estudo &amp; Portfólio</div>
+                <span style="font-size: 12.5px; color: #cbd5e1;">Ideal para estudantes, desenvolvedores e criadores open-source</span>
+              </div>
+
+              <div class="card-glass s1-pil-2" style="padding: 18px; background: rgba(30,41,59,0.75); border: 1px solid rgba(168,85,247,0.28);">
+                <span class="mono" style="font-size: 11px; color: #c084fc; font-weight: 700;">EXPLICAÇÃO HUMANA</span>
+                <div style="font-size: 24px; font-weight: 900; color: #fff; margin: 6px 0;">Voz Neural IA</div>
+                <span style="font-size: 12.5px; color: #cbd5e1;">Narração fluida em português gerada pelo Google Gemini</span>
+              </div>
+
+              <div class="card-glass s1-pil-3" style="padding: 18px; background: rgba(30,41,59,0.75); border: 1px solid rgba(52,211,153,0.28);">
+                <span class="mono" style="font-size: 11px; color: #34d399; font-weight: 700;">SINCRONIA AUTOMÁTICA</span>
+                <div style="font-size: 24px; font-weight: 900; color: #fff; margin: 6px 0;">Python + FFprobe</div>
+                <span style="font-size: 12.5px; color: #cbd5e1;">Alinha cada explicação falada com as animações na tela</span>
+              </div>
+
+              <div class="card-glass s1-pil-4" style="padding: 18px; background: rgba(30,41,59,0.75); border: 1px solid rgba(244,114,182,0.28);">
+                <span class="mono" style="font-size: 11px; color: #f472b6; font-weight: 700;">PRONTO PARA ASSISTIR</span>
+                <div style="font-size: 24px; font-weight: 900; color: #fff; margin: 6px 0;">Vídeo + README</div>
+                <span style="font-size: 12.5px; color: #cbd5e1;">Player integrado no topo do repositório em alta definição</span>
+              </div>
+            </div>
+
+            <div style="background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.3); border-radius: 12px; padding: 12px 18px; text-align: center;">
+              <span class="mono" style="font-size: 12.5px; color: #e2e8f0;">✨ Aproxima quem criou o código de quem está visitando o projeto</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- CENA 2: A SOLUÇÃO — EXPLICAÇÃO AUTOMÁTICA (REMOTO/LOCAL) -->
+      <!-- ======================================================== -->
+      <section id="scene_2" class="scene">
+        <div class="scene-header">
+          <div class="scene-kicker mono">02 // A SOLUÇÃO: EXPLICAÇÃO AUTOMÁTICA PARA QUALQUER REPOSITÓRIO</div>
+          <h1 class="scene-title">Repositórios Mais Humanos e Práticos de Compreender</h1>
+          <p class="scene-desc">Informe o link do GitHub ou o caminho de uma pasta local: a IA explora os arquivos e cria a apresentação sem gravar telas.</p>
+        </div>
+
+        <div class="grid-2col">
+          <!-- Left: prompt.txt Orchestration Engine -->
+          <div class="card-glass s2-pipe-panel" style="justify-content: space-between;">
+            <span class="tech-pill badge-info mono" style="margin-bottom: 12px; width: fit-content;">ENTRADA SIMPLES E DIRETA — prompt.txt</span>
+
+            <div class="terminal-box" style="flex: 1; display: flex; flex-direction: column;">
+              <div class="terminal-header">
+                <div class="t-dot t-red"></div>
+                <div class="t-dot t-yellow"></div>
+                <div class="t-dot t-green"></div>
+                <span class="terminal-title mono">prompt.txt — Escolha um Link do GitHub ou Pasta Local</span>
+              </div>
+              <div class="terminal-body mono" style="font-size: 13px;">
+                <span class="code-comment"># Basta informar onde está o seu projeto:</span><br>
+                <span class="code-var">[ALVO]</span> = <span class="code-str">"https://github.com/usuario/meu-projeto"</span> <span class="code-comment"># ou "C:\Projetos\app"</span><br><br>
+
+                <span class="code-kw">if</span> target.<span class="code-fn">startswith</span>(<span class="code-str">"https://github.com/"</span>):<br>
+                &nbsp;&nbsp;<span class="code-comment"># Modo Remoto: Baixa em pasta temporária e analisa</span><br>
+                &nbsp;&nbsp;git.<span class="code-fn">clone</span>(target, <span class="code-str">"./temp_workspace"</span>)<br>
+                &nbsp;&nbsp;project_summary = <span class="code-fn">explore_project_files</span>(<span class="code-str">"./temp_workspace"</span>)<br><br>
+
+                <span class="code-kw">elif</span> os.path.<span class="code-fn">isdir</span>(target):<br>
+                &nbsp;&nbsp;<span class="code-comment"># Modo Local: Lê os arquivos diretamente no computador</span><br>
+                &nbsp;&nbsp;project_summary = <span class="code-fn">explore_project_files</span>(target)<br>
+                &nbsp;&nbsp;output_video = os.path.<span class="code-fn">join</span>(target, <span class="code-str">"assets/demo.mp4"</span>)<br><br>
+
+                <span class="code-comment"># Cria uma apresentação completa sem gravar telas manualmente</span><br>
+                storyboard = <span class="code-fn">create_didactic_story</span>(project_summary)
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 14px;">
+              <span class="tech-pill mono">✓ Leitura Inteligente dos Arquivos</span>
+              <span class="tech-pill mono">✓ Sem Gravações Manuais</span>
+              <span class="tech-pill mono">✓ Proteção Automática do .env</span>
+            </div>
+          </div>
+
+          <!-- Right: Hybrid Execution Modes -->
+          <div class="card-glass s2-arch-panel" style="justify-content: space-between;">
+            <span class="tech-pill badge-success mono" style="margin-bottom: 12px; width: fit-content;">DOIS MODOS PRÁTICOS DE USO</span>
+
+            <!-- Mode 1: Remote GitHub URL -->
+            <div class="arch-engine-box s2-eng-1" style="border-left: 4px solid #38bdf8; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+              <div class="arch-title">
+                <span style="font-size: 22px;">🌐</span>
+                <span>Modo 1: Link de Repositório do GitHub</span>
+                <span class="tech-pill mono" style="margin-left: auto; color: #38bdf8;">https://github.com/...</span>
+              </div>
+              <p class="arch-desc">
+                Ideal para repositórios já publicados. A ferramenta clona o projeto em <code class="mono" style="color: #38bdf8;">./temp_workspace</code>, entende o código, gera o vídeo explicativo, atualiza o <code class="mono" style="color: #38bdf8;">README.md</code> e limpa a pasta temporária ao final.
+              </p>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <span class="tech-pill mono" style="font-size: 11px;">Clone Automático</span>
+                <span class="tech-pill mono" style="font-size: 11px;">Compreensão do Propósito</span>
+                <span class="tech-pill mono" style="font-size: 11px;">Limpeza Automática</span>
+              </div>
+            </div>
+
+            <!-- Mode 2: Local Directory Path -->
+            <div class="arch-engine-box s2-eng-2" style="border-left: 4px solid #a855f7; margin-bottom: 0; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+              <div class="arch-title">
+                <span style="font-size: 22px;">📂</span>
+                <span>Modo 2: Caminho de Pasta Local</span>
+                <span class="tech-pill mono" style="margin-left: auto; color: #c084fc;">C:\... ou /...</span>
+              </div>
+              <p class="arch-desc">
+                Ideal para projetos no seu computador. A ferramenta analisa os arquivos diretamente na pasta original sem clonar, gerando o vídeo <code class="mono" style="color: #c084fc;">assets/demo.mp4</code> e o <code class="mono" style="color: #c084fc;">README.md</code> sem apagar nada do seu projeto.
+              </p>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <span class="tech-pill mono" style="font-size: 11px;">Leitura Direta Local</span>
+                <span class="tech-pill mono" style="font-size: 11px;">Preserva Seus Arquivos</span>
+                <span class="tech-pill mono" style="font-size: 11px;">Rápido e Simples</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- CENA 3: COMO FUNCIONA — VOZ NATURAL + VISUAL SINCRONIZADO-->
+      <!-- ======================================================== -->
+      <section id="scene_3" class="scene">
+        <div class="scene-header">
+          <div class="scene-kicker mono">03 // COMO FUNCIONA: DO CÓDIGO À HISTÓRIA VISUAL SINCRONIZADA</div>
+          <h1 class="scene-title">Roteiro Didático, Voz Neural e Sincronia em Milissegundos</h1>
+          <p class="scene-desc">Cada explicação falada pela voz neural do Google Gemini é medida via Python/FFprobe e alinhada com as animações na tela.</p>
+        </div>
+
+        <div class="grid-2col">
+          <!-- Left: 4 Synchronized Steps -->
+          <div class="card-glass s3-layers-panel" style="justify-content: space-between;">
+            <span class="tech-pill badge-info mono" style="margin-bottom: 10px; width: fit-content;">PIPELINE SINCRONIZADO EM 4 ETAPAS</span>
+
+            <div class="layer-card s3-l1" style="border-left: 4px solid #38bdf8;">
+              <div class="layer-num mono" style="background: rgba(56,189,248,0.15); color: #38bdf8;">01</div>
+              <div>
+                <div style="font-size: 16px; font-weight: 800; color: #fff;">Roteiro Didático (Problema e Solução)</div>
+                <div style="font-size: 13px; color: #cbd5e1; margin-top: 2px;">Transforma a lógica do código em uma história clara, acessível e fácil de acompanhar.</div>
+              </div>
+            </div>
+
+            <div class="layer-card s3-l2" style="border-left: 4px solid #c084fc;">
+              <div class="layer-num mono" style="background: rgba(168,85,247,0.15); color: #c084fc;">02</div>
+              <div>
+                <div style="font-size: 16px; font-weight: 800; color: #fff;">Narração Fluida com Voz Neural do Google Gemini</div>
+                <div style="font-size: 13px; color: #cbd5e1; margin-top: 2px;">Síntese de voz natural em português via <code class="mono" style="color: #c084fc;">google-genai</code> gerando arquivos WAV limpos.</div>
+              </div>
+            </div>
+
+            <div class="layer-card s3-l3" style="border-left: 4px solid #34d399;">
+              <div class="layer-num mono" style="background: rgba(16,185,129,0.15); color: #34d399;">03</div>
+              <div>
+                <div style="font-size: 16px; font-weight: 800; color: #fff;">Medição Exata em Milissegundos (Python + FFprobe)</div>
+                <div style="font-size: 13px; color: #cbd5e1; margin-top: 2px;">Calcula a duração exata de cada fala (<code class="mono" style="color: #34d399;">timings.json</code>) para não cortar nenhuma palavra.</div>
+              </div>
+            </div>
+
+            <div class="layer-card s3-l4" style="border-left: 4px solid #f472b6; margin-bottom: 0;">
+              <div class="layer-num mono" style="background: rgba(244,114,182,0.15); color: #f472b6;">04</div>
+              <div>
+                <div style="font-size: 16px; font-weight: 800; color: #fff;">Animações Alinhadas na Tela (Hyperframes + GSAP)</div>
+                <div style="font-size: 13px; color: #cbd5e1; margin-top: 2px;">Os elementos visuais entram na tela exatamente no instante em que são explicados.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Live Code & FFprobe Telemetry -->
+          <div class="card-glass s3-code-panel" style="justify-content: space-between;">
+            <div class="terminal-box s3-code-box">
+              <div class="terminal-header">
+                <div class="t-dot t-red"></div>
+                <div class="t-dot t-yellow"></div>
+                <div class="t-dot t-green"></div>
+                <span class="terminal-title mono">generate_audio.py &amp; scripts/probe_timings.py</span>
+              </div>
+              <div class="terminal-body mono" style="font-size: 12.5px;">
+                <span class="code-comment"># 1. Gera narração fluida com a voz neural do Google Gemini</span><br>
+                response = client.models.<span class="code-fn">generate_content</span>(<br>
+                &nbsp;&nbsp;model=<span class="code-str">"gemini-2.5-flash-preview-tts"</span>,<br>
+                &nbsp;&nbsp;contents=scene[<span class="code-str">"text"</span>], <span class="code-comment"># Roteiro didático puro</span><br>
+                &nbsp;&nbsp;config=types.<span class="code-fn">GenerateContentConfig</span>(response_modalities=[<span class="code-str">"AUDIO"</span>])<br>
+                )<br><br>
+                <span class="code-comment"># 2. Mede a duração exata em milissegundos via FFprobe</span><br>
+                probe = <span class="code-fn">measure_audio_duration</span>(scene[<span class="code-str">"file"</span>])<br>
+                <span class="code-comment"># -&gt; cena_01: 18531ms | cena_02: 21611ms | cena_03: 27251ms | cena_04: 23851ms</span>
+              </div>
+            </div>
+
+            <!-- Telemetry Timings Table -->
+            <div class="stat-metric-card s3-telemetry-box" style="margin-bottom: 0; background: rgba(6,11,22,0.95); border-color: rgba(52,211,153,0.3);">
+              <div class="stat-metric-header">
+                <span class="mono" style="font-size: 12px; color: #34d399; font-weight: 700;">TEMPOS EXATOS MEDIDOS NESTA EXECUÇÃO (FFPROBE)</span>
+                <span class="tech-pill badge-success mono">91.24s NARRAÇÃO TOTAL</span>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px;">
+                <div style="background: rgba(15,23,42,0.9); padding: 10px; border-radius: 8px; text-align: center;">
+                  <div class="mono" style="font-size: 11px; color: #cbd5e1;">CENA 01</div>
+                  <div class="mono" style="font-size: 17px; font-weight: 800; color: #38bdf8;">18.53s</div>
+                  <div class="mono" style="font-size: 10px; color: #94a3b8;">0.50s → 19.03s</div>
+                </div>
+                <div style="background: rgba(15,23,42,0.9); padding: 10px; border-radius: 8px; text-align: center;">
+                  <div class="mono" style="font-size: 11px; color: #cbd5e1;">CENA 02</div>
+                  <div class="mono" style="font-size: 17px; font-weight: 800; color: #c084fc;">21.61s</div>
+                  <div class="mono" style="font-size: 10px; color: #94a3b8;">20.13s → 41.74s</div>
+                </div>
+                <div style="background: rgba(15,23,42,0.9); padding: 10px; border-radius: 8px; text-align: center;">
+                  <div class="mono" style="font-size: 11px; color: #cbd5e1;">CENA 03</div>
+                  <div class="mono" style="font-size: 17px; font-weight: 800; color: #34d399;">27.25s</div>
+                  <div class="mono" style="font-size: 10px; color: #94a3b8;">42.84s → 70.09s</div>
+                </div>
+                <div style="background: rgba(15,23,42,0.9); padding: 10px; border-radius: 8px; text-align: center;">
+                  <div class="mono" style="font-size: 11px; color: #cbd5e1;">CENA 04</div>
+                  <div class="mono" style="font-size: 17px; font-weight: 800; color: #f472b6;">23.85s</div>
+                  <div class="mono" style="font-size: 10px; color: #94a3b8;">71.19s → 95.04s</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- CENA 4: O RESULTADO — GITHUB MAIS VIVO E DIDÁTICO        -->
+      <!-- ======================================================== -->
+      <section id="scene_4" class="scene">
+        <div class="scene-header">
+          <div class="scene-kicker mono">04 // O RESULTADO: UM GITHUB MAIS VIVO, VISUAL E DIDÁTICO</div>
+          <h1 class="scene-title">Vídeo em Alta Definição e README Pronto para Publicação</h1>
+          <p class="scene-desc">Tecnologia e inteligência artificial para tornar seus repositórios mais acessíveis, visuais e fáceis de entender.</p>
+        </div>
+
+        <div class="grid-2col">
+          <!-- Left: Automated Deliverables -->
+          <div class="card-glass s4-left-panel" style="display: flex; flex-direction: column; justify-content: space-between; gap: 14px;">
+            <span class="tech-pill badge-success mono" style="width: fit-content;">O QUE A FERRAMENTA ENTREGA AUTOMATICAMENTE</span>
+
+            <!-- Deliverable 1 -->
+            <div class="rec-card s4-rec-1" style="border-left: 4px solid #38bdf8;">
+              <div class="rec-icon" style="background: rgba(56,189,248,0.15); color: #38bdf8;">🎬</div>
+              <div>
+                <div style="font-size: 17px; font-weight: 800; color: #ffffff;">Vídeo Explicativo em Alta Definição (assets/demo.mp4)</div>
+                <p style="font-size: 13.5px; color: #cbd5e1; margin-top: 6px; line-height: 1.45;">
+                  Renderizado em Full HD (1080p) com narração clara em primeiro plano e trilha sonora instrumental suave de fundo.
+                </p>
+              </div>
+            </div>
+
+            <!-- Deliverable 2 -->
+            <div class="rec-card s4-rec-2" style="border-left: 4px solid #a855f7;">
+              <div class="rec-icon" style="background: rgba(168,85,247,0.15); color: #c084fc;">📄</div>
+              <div>
+                <div style="font-size: 17px; font-weight: 800; color: #ffffff;">README Claro com Player Integrado no Topo</div>
+                <p style="font-size: 13.5px; color: #cbd5e1; margin-top: 6px; line-height: 1.45;">
+                  Quem abre o repositório assiste ao vídeo imediatamente e compreende a estrutura, o fluxo e como executar o projeto.
+                </p>
+              </div>
+            </div>
+
+            <!-- Deliverable 3 -->
+            <div class="rec-card s4-rec-3" style="border-left: 4px solid #10b981;">
+              <div class="rec-icon" style="background: rgba(16,185,129,0.15); color: #34d399;">🚀</div>
+              <div>
+                <div style="font-size: 17px; font-weight: 800; color: #ffffff;">Revisão Segura e Pronto para Publicação no GitHub</div>
+                <p style="font-size: 13.5px; color: #cbd5e1; margin-top: 6px; line-height: 1.45;">
+                  Protege chaves sensíveis (<code class="mono" style="color: #34d399;">.env</code>), sugere a descrição do repositório e publica após a sua aprovação.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Author & Well-Distributed Tech Ecosystem (No Empty Gaps) -->
+          <div class="card-glass s4-right-panel" style="display: flex; flex-direction: column; justify-content: space-between; gap: 14px;">
+            <div class="author-card s4-author-box">
+              <div class="avatar-circle mono">CC</div>
+              <div>
+                <div style="font-size: 25px; font-weight: 900; color: #ffffff;">César Carneiro</div>
+                <div class="mono" style="font-size: 13.5px; color: #38bdf8; font-weight: 700; margin-top: 3px;">Gestor de Implementação de IA &amp; Analista de Dados</div>
+                <div class="mono" style="font-size: 12px; color: #cbd5e1; margin-top: 6px;">github.com/Cesaraugusto916/ai-repo-launch-studio</div>
+              </div>
+            </div>
+
+            <!-- Tech Stack Structured Grid (Fills middle space cleanly) -->
+            <div class="stat-metric-card s4-stack-box" style="margin: 0; flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 18px 22px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span class="mono" style="font-size: 12px; color: #38bdf8; font-weight: 700;">ECOSSISTEMA TECNOLÓGICO DO PROJETO</span>
+                <span class="tech-pill badge-info mono" style="font-size: 11px; padding: 3px 10px;">100% AUTOMATIZADO</span>
+              </div>
+
+              <div class="stack-grid s4-tags">
+                <div class="stack-item">
+                  <span class="mono" style="font-size: 12.5px; font-weight: 700; color: #fff;">Python &amp; FFprobe</span>
+                  <span class="mono" style="font-size: 11px; color: #94a3b8;">Sincronia de Áudio</span>
+                </div>
+                <div class="stack-item">
+                  <span class="mono" style="font-size: 12.5px; font-weight: 700; color: #fff;">Google Gemini TTS</span>
+                  <span class="mono" style="font-size: 11px; color: #94a3b8;">Voz Neural Natural</span>
+                </div>
+                <div class="stack-item">
+                  <span class="mono" style="font-size: 12.5px; font-weight: 700; color: #fff;">Hyperframes CLI</span>
+                  <span class="mono" style="font-size: 11px; color: #94a3b8;">Render Full HD 1080p</span>
+                </div>
+                <div class="stack-item">
+                  <span class="mono" style="font-size: 12.5px; font-weight: 700; color: #fff;">HTML5 / CSS3 / GSAP</span>
+                  <span class="mono" style="font-size: 11px; color: #94a3b8;">Animações em Tempo Real</span>
+                </div>
+                <div class="stack-item">
+                  <span class="mono" style="font-size: 12.5px; font-weight: 700; color: #fff;">Modo Híbrido</span>
+                  <span class="mono" style="font-size: 11px; color: #94a3b8;">URL GitHub ou Pasta Local</span>
+                </div>
+                <div class="stack-item">
+                  <span class="mono" style="font-size: 12.5px; font-weight: 700; color: #fff;">Google Antigravity</span>
+                  <span class="mono" style="font-size: 11px; color: #94a3b8;">Orquestração Agêntica</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Final Value Proposition Banner -->
+            <div style="background: rgba(16,185,129,0.14); border: 1px solid rgba(16,185,129,0.38); border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;" class="s4-final-banner">
+              <div style="display: flex; align-items: center; gap: 14px;">
+                <span style="font-size: 26px;">✨</span>
+                <div>
+                  <div style="font-size: 15.5px; font-weight: 800; color: #ffffff;">AI Repo Launch Studio</div>
+                  <div style="font-size: 13px; color: #cbd5e1;">Tornando seus repositórios mais acessíveis, visuais e fáceis de entender.</div>
+                </div>
+              </div>
+              <span class="tech-pill badge-success mono" style="font-size: 11px;">OPEN-SOURCE</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- GSAP TIMELINE SCRIPT ACCORDING TO MEASURED FFPROBE TIMINGS -->
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      // ========================================================
+      // TIMELINE MAP: TOTAL 97.00s
+      // CENA 1: 0.00s -> 19.65s  (VO: 0.50s -> 19.03s | 18.531s)
+      // CENA 2: 19.65s -> 42.35s (VO: 20.13s -> 41.74s | 21.611s)
+      // CENA 3: 42.35s -> 70.70s (VO: 42.84s -> 70.09s | 27.251s)
+      // CENA 4: 70.70s -> 97.00s (VO: 71.19s -> 95.04s | 23.851s)
+      // ========================================================
+
+      // ==================== CENA 1 (0.00s -> 19.65s) ====================
+      tl.set("#scene_1", { autoAlpha: 1 }, 0.00);
+      tl.from("#scene_1 .scene-kicker", { opacity: 0, y: -20, duration: 0.6, ease: "power2.out" }, 0.20);
+      tl.from("#scene_1 .scene-title", { opacity: 0, y: 25, duration: 0.8, ease: "power3.out" }, 0.45);
+      tl.from("#scene_1 .scene-desc", { opacity: 0, y: 18, duration: 0.7, ease: "power2.out" }, 0.80);
+
+      // Left panel & terminal ("Entender o que um repositório faz apenas lendo blocos de texto...")
+      tl.from(".s1-terminal", { opacity: 0, x: -30, duration: 0.7, ease: "power2.out" }, 1.10);
+      tl.from(".s1-p1", { opacity: 0, x: -20, duration: 0.5, ease: "power2.out" }, 3.50);
+      tl.from(".s1-p2", { opacity: 0, x: -20, duration: 0.5, ease: "power2.out" }, 6.20);
+      tl.from(".s1-p3", { opacity: 0, x: -20, duration: 0.5, ease: "power2.out" }, 8.80);
+
+      // Right panel solution ("falta uma explicação visual, rápida e acessível logo no primeiro contato...")
+      tl.from(".s1-solution-panel", { opacity: 0, x: 30, duration: 0.8, ease: "power3.out" }, 11.20);
+      tl.from(".s1-pil-1", { opacity: 0, y: 15, duration: 0.45, ease: "power2.out" }, 12.50);
+      tl.from(".s1-pil-2", { opacity: 0, y: 15, duration: 0.45, ease: "power2.out" }, 13.70);
+      tl.from(".s1-pil-3", { opacity: 0, y: 15, duration: 0.45, ease: "power2.out" }, 14.90);
+      tl.from(".s1-pil-4", { opacity: 0, y: 15, duration: 0.45, ease: "power2.out" }, 16.10);
+
+      // Transition out Scene 1
+      tl.to("#scene_1", { opacity: 0, scale: 0.97, duration: 0.45, ease: "power2.in" }, 19.20);
+      tl.set("#scene_1", { autoAlpha: 0 }, 19.65);
+
+      // ==================== CENA 2 (19.65s -> 42.35s) ====================
+      tl.set("#scene_2", { autoAlpha: 1 }, 19.65);
+      tl.from("#scene_2 .scene-kicker", { opacity: 0, y: -20, duration: 0.6, ease: "power2.out" }, 19.80);
+      tl.from("#scene_2 .scene-title", { opacity: 0, y: 25, duration: 0.8, ease: "power3.out" }, 20.05);
+      tl.from("#scene_2 .scene-desc", { opacity: 0, y: 18, duration: 0.7, ease: "power2.out" }, 20.40);
+
+      // Left orchestration prompt.txt ("O AI Repo Launch Studio nasceu para tornar qualquer repositório...")
+      tl.from(".s2-pipe-panel", { opacity: 0, x: -30, duration: 0.8, ease: "power3.out" }, 21.00);
+
+      // Right hybrid modes ("Basta informar o link do GitHub ou o caminho de uma pasta local...")
+      tl.from(".s2-arch-panel", { opacity: 0, x: 30, duration: 0.8, ease: "power3.out" }, 25.50);
+      tl.from(".s2-eng-1", { opacity: 0, y: 20, duration: 0.65, ease: "power2.out" }, 26.80);
+      tl.from(".s2-eng-2", { opacity: 0, y: 20, duration: 0.65, ease: "power2.out" }, 32.00);
+
+      // Transition out Scene 2
+      tl.to("#scene_2", { opacity: 0, scale: 0.97, duration: 0.45, ease: "power2.in" }, 41.90);
+      tl.set("#scene_2", { autoAlpha: 0 }, 42.35);
+
+      // ==================== CENA 3 (42.35s -> 70.70s) ====================
+      tl.set("#scene_3", { autoAlpha: 1 }, 42.35);
+      tl.from("#scene_3 .scene-kicker", { opacity: 0, y: -20, duration: 0.6, ease: "power2.out" }, 42.50);
+      tl.from("#scene_3 .scene-title", { opacity: 0, y: 25, duration: 0.8, ease: "power3.out" }, 42.75);
+      tl.from("#scene_3 .scene-desc", { opacity: 0, y: 18, duration: 0.7, ease: "power2.out" }, 43.15);
+
+      // 4 Layers synchronized with speech
+      tl.from(".s3-layers-panel", { opacity: 0, x: -30, duration: 0.7, ease: "power3.out" }, 43.50);
+      // "Primeiro, estrutura um roteiro didático..."
+      tl.from(".s3-l1", { opacity: 0, x: -20, duration: 0.6, ease: "power2.out" }, 46.50);
+      // "Depois, gera uma narração fluida com a voz neural do Google Gemini..."
+      tl.from(".s3-l2", { opacity: 0, x: -20, duration: 0.6, ease: "power2.out" }, 51.50);
+      // "Um script em Python mede a duração exata de cada fala em milissegundos..."
+      tl.from(".s3-l3", { opacity: 0, x: -20, duration: 0.6, ease: "power2.out" }, 57.20);
+      // "alinhando as animações na tela exatamente com o que está sendo explicado."
+      tl.from(".s3-l4", { opacity: 0, x: -20, duration: 0.6, ease: "power2.out" }, 63.50);
+
+      // Right panel code & telemetry
+      tl.from(".s3-code-panel", { opacity: 0, x: 30, duration: 0.8, ease: "power3.out" }, 52.50);
+      tl.from(".s3-code-box", { opacity: 0, y: 15, duration: 0.6, ease: "power2.out" }, 53.50);
+      tl.from(".s3-telemetry-box", { opacity: 0, scale: 0.95, duration: 0.7, ease: "back.out(1.4)" }, 59.00);
+
+      // Transition out Scene 3
+      tl.to("#scene_3", { opacity: 0, scale: 0.97, duration: 0.45, ease: "power2.in" }, 70.25);
+      tl.set("#scene_3", { autoAlpha: 0 }, 70.70);
+
+      // ==================== CENA 4 (70.70s -> 97.00s) ====================
+      tl.set("#scene_4", { autoAlpha: 1 }, 70.70);
+      tl.from("#scene_4 .scene-kicker", { opacity: 0, y: -20, duration: 0.6, ease: "power2.out" }, 70.85);
+      tl.from("#scene_4 .scene-title", { opacity: 0, y: 25, duration: 0.8, ease: "power3.out" }, 71.10);
+      tl.from("#scene_4 .scene-desc", { opacity: 0, y: 18, duration: 0.7, ease: "power2.out" }, 71.50);
+
+      // Left deliverables ("Ao final do processo, a ferramenta entrega o vídeo em alta definição...")
+      tl.from(".s4-left-panel", { opacity: 0, x: -30, duration: 0.8, ease: "power3.out" }, 72.00);
+      tl.from(".s4-rec-1", { opacity: 0, x: -18, duration: 0.5, ease: "power2.out" }, 73.20);
+      tl.from(".s4-rec-2", { opacity: 0, x: -18, duration: 0.5, ease: "power2.out" }, 76.50);
+      tl.from(".s4-rec-3", { opacity: 0, x: -18, duration: 0.5, ease: "power2.out" }, 80.00);
+
+      // Right authority & conclusion ("AI Repo Launch Studio: tecnologia e inteligência artificial...")
+      tl.from(".s4-right-panel", { opacity: 0, x: 30, duration: 0.8, ease: "power3.out" }, 82.80);
+      tl.from(".s4-author-box", { opacity: 0, scale: 0.92, duration: 0.7, ease: "back.out(1.4)" }, 84.00);
+      tl.from(".s4-tags .stack-item", { opacity: 0, y: 10, stagger: 0.08, duration: 0.35, ease: "power2.out" }, 86.20);
+      tl.from(".s4-final-banner", { opacity: 0, y: 15, duration: 0.6, ease: "power2.out" }, 89.50);
+      tl.to(".s4-final-banner", { scale: 1.02, duration: 0.4, yoyo: true, repeat: 2 }, 92.00);
+
+      // Hold until final timestamp
+      tl.set({}, {}, 97.00);
+
+      // Register timeline for Hyperframes engine
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

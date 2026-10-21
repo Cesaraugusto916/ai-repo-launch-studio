@@ -1,0 +1,44 @@
+# =============================================================================
+# SEGURANÇA CRÍTICA (Prioridade Zero - Credenciais e Chaves de API)
+# =============================================================================
+.env
+.env.*
+!.env.example
+
+# =============================================================================
+# WORKSPACE TEMPORÁRIO & BUILDS DE RENDERIZAÇÃO
+# =============================================================================
+temp_workspace/
+brag-output/
+brag-output-*/
+brag-composition/.hyperframes/
+brag-composition/renders/
+brag-composition/assets/audio/*.wav
+brag-composition/assets/audio/*.json
+
+# =============================================================================
+# VÍDEOS GERADOS DE OUTROS PROJETOS (Mantém apenas assets/demo.mp4 oficial)
+# =============================================================================
+*.mp4
+!assets/demo.mp4
+
+# =============================================================================
+# PYTHON & AMBIENTES VIRTUAIS
+# =============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+
+# =============================================================================
+# NODE.JS & FERRAMENTAS DE SISTEMA
+# =============================================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db
